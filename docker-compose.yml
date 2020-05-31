@@ -1,0 +1,34 @@
+version: '3.0'
+
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: ZOOKKEPER
+    restart: always
+    network_mode: host
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: KAFKA
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+#    restart: always
+    network_mode: host
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    command: "sh opt/kafka_2.12-2.5.0/bin/kafka-topics.sh --create --zookeeper:2181 --replication-factor 1 --partitions 1 --topic drones"
+
+
+#  drones:
+#    build: drones/
+#    container_name: DRONES
+#    depends_on:
+#      - kafka
+#    network_mode: host
+#    command: "sbt run"
