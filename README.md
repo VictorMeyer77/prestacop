@@ -19,6 +19,7 @@ machine dans votre réseau:
     
     
     cd recordManager
+    
     sbt clean assembly
 
 
