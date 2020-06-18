@@ -1,6 +1,8 @@
 FROM openjdk:8
 
-ADD src /
+ADD src /src
+ADD conf /conf
+ADD media /media
 ADD build.sbt /
 
 RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list

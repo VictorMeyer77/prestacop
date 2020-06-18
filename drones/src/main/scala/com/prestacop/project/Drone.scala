@@ -1,20 +1,12 @@
-package com.prestacop.project.bean
+package com.prestacop.project
 
 import java.util.Calendar
 import scala.util.Random
-import com.prestacop.project.kafka.Producer
+import com.prestacop.project.bean._
 
-// decimale long lat 3
-// delta lat = 0.111 km -> 111 m
-// delta long = 0.084 km -> 84 m
-// vitesse drone 60km / h -> 1km / m -> 16m / s
-// delta lat = 7s
-// delta long = 5,25s
+class Drone(val id: Int, val conf: Configuration) {
 
-// 40.770 -74.023                                                       40.764  -73.739
-// 40.611 -74.031                                                       40.625  -73.715
-
-class Drone(val id: Int) {
+  // --- Hyper paramètres pour simuler déplacement drone --- //
 
   val speed: Double = Random.nextInt(20000) + 50000.0
   val timePerLat: Double = 111.0 / (speed / 3600.0) * 1000
@@ -33,6 +25,7 @@ class Drone(val id: Int) {
   var heartBeatFlag: Long = 0
   var direction: Boolean = true
 
+  // retourne timestamp actuel
 
   def getTimeInMillis: Long ={
     Calendar.getInstance().getTimeInMillis
@@ -40,21 +33,50 @@ class Drone(val id: Int) {
 
   // --- Heart Beat --- //
 
+
   def getJsonHeartBeat(date: Long): String ={
-    String.format("{\"id\": %s, \"date\": %s, \"latitude\": %s, \"longitude\": %s, \"battery\": %s}",
-      id.toString, date.toString, latitude.toString, longitude.toString, battery.toString)
+    val coordinate: Coordinate = new Coordinate(latitude, longitude)
+    val alert: Alert = new Alert(0, "", "")
+    new Record(id, date, coordinate, battery, alert).toString
   }
+
 
   def isToSendHB: Boolean={
     heartBeatFlag + heartBeatInterval < getTimeInMillis
   }
 
-  def sendHeartBeat(): Unit ={
+
+  def sendHeartBeat: Unit ={
     if(isToSendHB){
       Producer.produceHeartBeat(getJsonHeartBeat(getTimeInMillis))
       heartBeatFlag = getTimeInMillis
+      log("Heartbeat envoyé")
+    }
+  }
+
+  // --- Alertes  --- //
+
+  def getAlert: String ={
+
+    var alert: Alert = null
+    Random.nextInt(3) match{
+      case 0 => alert = new Alert(1, "stationnement gênant",
+        Image.byteArrayToString(Image.imgToArrayByte(conf.sgPath)))
+      case 1 => alert = new Alert(2, "suspucion de fuite après accident",
+        Image.byteArrayToString(Image.imgToArrayByte(conf.sfPath)))
+      case 2 => alert = new Alert(3, "léger embouteillage",
+        Image.byteArrayToString(Image.imgToArrayByte(conf.lePath)))
     }
 
+    val coordinate: Coordinate = new Coordinate(latitude, longitude)
+    new Record(id, getTimeInMillis, coordinate, battery, alert).toString
+  }
+
+  def sendAlert: Unit ={
+    if(Random.nextInt(10000000) == 1){
+      Producer.produceHeartBeat(getAlert)
+      log("Alerte envoyée")
+    }
   }
 
   // --- Déplacement --- //
@@ -85,7 +107,7 @@ class Drone(val id: Int) {
     target < minLong || target > maxLong
   }
 
-  def move(): Unit ={
+  def move: Unit ={
 
     if (isToMove && battery > 0) {
       val sens = generateSens
@@ -99,6 +121,12 @@ class Drone(val id: Int) {
 
       updateMove()
     }
+  }
+
+  // --- log --- //
+
+  def log(message: String): Unit ={
+    println(String.format("drone: %s -> %s", id.toString, message))
   }
 
 }

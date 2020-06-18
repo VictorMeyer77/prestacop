@@ -1,0 +1,11 @@
+{
+
+  "kafkaHost": "debian",
+  "kafkaPort": "9092",
+  "kafkaTopic": "prestacop",
+  "kafkaGroup": "cluster1",
+  "mongoUrl": "mongodb://debian/",
+  "mongoHBCol": "prestacop.records",
+  "mongoAlertCol": "prestacop.alerts"
+
+}
