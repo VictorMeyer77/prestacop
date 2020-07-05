@@ -11,17 +11,27 @@ L'intégralié du projet est dockerisé
 machine dans votre réseau:
 
  * drones/conf/configuration.json -> kafkaHost
+ * alertManager/conf/configuration.json -> kafkaHost
  * recordManager/conf/configuration.json -> kafkaHost, MongoUrl
  * recordManager/Dockerfile -> SPARK_MASTER_NAME
  * docker-compose.yml -> *
 
-2) Compiler le jar du recordManager
+2) Compiler le jar du recordManager et de l'alertManager
     
     
     cd recordManager
     
     sbt clean assembly
+    
+    cd alertManager
+        
+    sbt clean assembly
 
+
+#### Temporaire
+
+Tant que alertManager n'est pas dockerisé: 
+adapter chemin du spark-submit dans lanch.sh
 
 #### Configuration simulation
 
@@ -31,7 +41,7 @@ Pour modifier le nombre de drones:
  
 #### Lancement
 
-    sudo docker-compose up
+    sudo sh launch.sh
 
 #### Monitoring spark
 

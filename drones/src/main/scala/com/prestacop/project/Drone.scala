@@ -73,8 +73,8 @@ class Drone(val id: Int, val conf: Configuration) {
   }
 
   def sendAlert: Unit ={
-    if(Random.nextInt(10000000) == 1){
-      Producer.produceHeartBeat(getAlert)
+    if(Random.nextInt(conf.alertFrequency) == 1){
+      Producer.produceAlert(getAlert)
       log("Alerte envoyée")
     }
   }

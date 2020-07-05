@@ -1,7 +1,5 @@
 package com.prestacop.project.bean
 
-import com.google.gson._
-
 class Record(id : Int, date : Long, coordinate: Coordinate, battery : Int, alert: Alert){
 
   override def toString: String ={

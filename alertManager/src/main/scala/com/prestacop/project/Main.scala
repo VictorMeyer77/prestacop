@@ -1,10 +1,9 @@
 package com.prestacop.project
 
 import java.io.FileReader
-
-import com.google.gson.Gson
 import com.prestacop.project.bean.{Configuration, Record}
 import org.apache.spark.sql._
+import com.google.gson.Gson
 
 object Main{
 
@@ -25,7 +24,7 @@ object Main{
 
       val gson: Gson = new Gson()
       val conf: Configuration = gson.fromJson(new FileReader(args(0)), classOf[Configuration])
-      MongoDao.conf = conf
+      BatchManager.conf = conf
       run(conf)
 
     }
@@ -47,7 +46,8 @@ object Main{
 
       import spark.implicits._
       val batchRecord = batchDF.map(content => content.getString(0)).mapPartitions(Record.parseFromJson(_))
-      MongoDao.manageBatch(batchRecord)
+      BatchManager.processAlert(batchRecord)
+
     }
       .start()
     query.awaitTermination()

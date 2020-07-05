@@ -1,6 +1,5 @@
 package com.prestacop.project.bean
 
-import com.google.gson._
 
 class Coordinate(latitude : Double, longitude : Double){
 

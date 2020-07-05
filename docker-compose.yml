@@ -21,7 +21,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: debian
       KAFKA_ZOOKEEPER_CONNECT: debian:2181
-      KAFKA_CREATE_TOPICS: "prestacop:1:1"
+      KAFKA_CREATE_TOPICS: "records:1:1,alerts:1:1"
     network_mode: host
 
   mongodb :
@@ -86,17 +86,42 @@ services:
       - "SPARK_MASTER=spark://debian:7077"
     network_mode: host
 
+  spark-worker-4:
+    image: bde2020/spark-worker:2.4.5-hadoop2.7
+    container_name: SPARKWORKER4
+    depends_on:
+      - spark-master
+    ports:
+      - "8084:8084"
+    environment:
+      - "SPARK_MASTER=spark://debian:7077"
+    network_mode: host
+
   record-manager:
     build: recordManager
     container_name: RECORDMANAGER
     depends_on:
       - drones
     ports:
-      - "8084:8084"
+      - "8085:8085"
     environment:
       - ENABLE_INIT_DAEMON=false
     network_mode: host
     command: sh submit.sh
+
+#  alert-manager:
+#    build: alertManager
+#    container_name: ALERTMANAGER
+#    depends_on:
+#      - drones
+#    volumes:
+#    - ./alertManager/output/img/:/output/img
+#    ports:
+#      - "8086:8086"
+#    environment:
+#      - ENABLE_INIT_DAEMON=false
+#    network_mode: host
+#    command: sh submit.sh
 
 volumes:
   mongodb:

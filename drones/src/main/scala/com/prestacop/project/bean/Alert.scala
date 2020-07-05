@@ -1,6 +1,5 @@
 package com.prestacop.project.bean
 
-import com.google.gson._
 
 class Alert(code: Int, label: String, imgByteString: String){
 
