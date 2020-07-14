@@ -1,34 +1,48 @@
 package com.prestacop.project
 
-import com.mongodb.spark.MongoSpark
-import com.mongodb.spark.config.WriteConfig
+import java.util.Calendar
 import org.apache.spark.sql._
-import com.mongodb.spark.config._
+import org.apache.spark.sql.functions._
 
 object Main {
 
   def main(args: Array[String]): Unit ={
-    val sparkRecords: SparkSession = SparkSession
+    val spark: SparkSession = SparkSession
       .builder()
-      .master("local")
-      .appName("testMongo")
+      .appName("statistics")
       .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/prestacop.records")
       .getOrCreate()
 
+    def getData: DataFrame={
+      spark.read.format("mongo").load()
+    }
 
-    val df = sparkRecords.read.format("mongo").load()
-    df.show()
+    @scala.annotation.tailrec
+    def run(): Unit={
+      val df: DataFrame = getData
+      println("20 drones avec le moins de batterie:")
+      getDronesLessBattery(df).show()
+      println("20 drones ayant envoyer les records les moins ancines")
+      getDronesOldRecord(df).show()
+      Thread.sleep(5000)
+      run()
+    }
 
-
-    // TODO: 20 drones avec le moins de batteries
-
-    //TODO: 20 drones avec les records les plus anciens
-
-    //TODO: 20 drones les plus au nord ...
+    run()
 
 
   }
 
+  def getTodayRecord(df: DataFrame): DataFrame ={
+    df.filter(df("date") > Calendar.getInstance().getTimeInMillis - (24 * 60 * 60))
+  }
 
+  def getDronesLessBattery(df: DataFrame): DataFrame ={
+    df.orderBy(col("battery").asc).limit(20).select(col("id"), col("battery"))
+  }
+
+  def getDronesOldRecord(df: DataFrame): DataFrame ={
+    df.orderBy(col("date").desc).limit(20).select(col("id"), col("date"))
+  }
 
 }
