@@ -1,0 +1,8 @@
+{
+
+  "kafkaHost": "debian",
+  "kafkaPort": "9092",
+  "kafkaRecordTopic": "records",
+  "csvPath": "data/nypd.csv"
+
+}
