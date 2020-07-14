@@ -38,8 +38,6 @@ services:
   drones:
     build: drones/
     container_name: DRONES
-    depends_on:
-      - kafka
     command: sbt "run conf/configuration.json"
     network_mode: host
 
@@ -108,6 +106,21 @@ services:
       - ENABLE_INIT_DAEMON=false
     network_mode: host
     command: sh submit.sh
+
+# A DECOMMENTER SI MACHINE >= 16 GO Ram
+# BON FONCTIONNEMENT NON GARANTIT CAR IMPOSSIBLE A TESTER
+
+#  statistics:
+#    build: statistics
+#    container_name: STATISTIQUES
+#    depends_on:
+#      - mongodb
+#    ports:
+#      - "8086:8086"
+#    environment:
+#      - ENABLE_INIT_DAEMON=false
+#    network_mode: host
+#    command: sh submit.sh
 
 #  alert-manager:
 #    build: alertManager

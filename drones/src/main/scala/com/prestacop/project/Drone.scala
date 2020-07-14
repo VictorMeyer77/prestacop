@@ -48,7 +48,7 @@ class Drone(val id: Int, val conf: Configuration) {
 
   def sendHeartBeat: Unit ={
     if(isToSendHB){
-      Producer.produceHeartBeat(getJsonHeartBeat(getTimeInMillis))
+      Producer.produceHeartBeat(getJsonHeartBeat(getTimeInMillis / 1000))
       heartBeatFlag = getTimeInMillis
       log("Heartbeat envoyé")
     }
@@ -69,7 +69,7 @@ class Drone(val id: Int, val conf: Configuration) {
     }
 
     val coordinate: Coordinate = new Coordinate(latitude, longitude)
-    new Record(id, getTimeInMillis, coordinate, battery, alert).toString
+    new Record(id, getTimeInMillis / 1000, coordinate, battery, alert).toString
   }
 
   def sendAlert: Unit ={
